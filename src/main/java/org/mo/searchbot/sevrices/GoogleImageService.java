@@ -18,23 +18,24 @@ public class GoogleImageService implements ImageService {
 
     @Override
     public List<String> getImages(String query) {
-        String googleQuery = "https://www.google.com/search?q=" + query + "&tbm=isch&nfpr=1";
-        return parseLinks(getHTML(googleQuery));
+        String googleQuery = "https://www.google.com/search?q=" + query.replaceAll(" ", "+") + "&tbm=isch&nfpr=1";
+        String html = "";
+        try {
+            html = getHTML(googleQuery);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return parseLinks(html);
     }
 
-    private String getHTML(String url) {
+    private String getHTML(String url) throws Exception {
         HttpRequest request = HttpRequest.newBuilder()
                 .setHeader("User-Agent", USER_AGENT)
                 .uri(URI.create(url))
                 .build();
-        try {
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            System.out.println(url + " request status: " + response.statusCode());
-            return response.body();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "";
-        }
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        System.out.println(url + " request status: " + response.statusCode());
+        return response.body();
     }
 
     private List<String> parseLinks(String HTML) {
