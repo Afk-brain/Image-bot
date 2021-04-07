@@ -1,0 +1,1 @@
+web: java -jar out/artifacts/Image_Search_Bot_jar/Image Search Bot.jargit
