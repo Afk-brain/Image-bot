@@ -1,3 +1,2 @@
-git aManifest-Version: 1.0
+Manifest-Version: 1.0
 Main-Class: org.mo.searchbot.Main
-
