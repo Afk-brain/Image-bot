@@ -2,6 +2,9 @@ package org.mo.searchbot.sevrices;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.annotation.Nullable;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -29,6 +32,7 @@ public class GoogleImageService implements ImageService {
                     "([-\\w~!$+|.,*:=]|%[a-f\\d]{2})*)*)*" +
                     "(#([-\\w~!$+|.,*:=]|%[a-f\\d]{2})*)?\\b");
     private HttpClient client = HttpClient.newHttpClient();
+    private Logger log = LoggerFactory.getLogger(GoogleImageService.class);
 
     @Override
     @Nullable
@@ -53,7 +57,7 @@ public class GoogleImageService implements ImageService {
                 .uri(URI.create(url))
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        System.out.println(url + " request status: " + response.statusCode());
+        log.info("{} request status: {}", url, response.statusCode());
         return response.body();
     }
 
