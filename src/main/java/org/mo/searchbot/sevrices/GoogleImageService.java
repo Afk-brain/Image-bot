@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -47,7 +48,8 @@ public class GoogleImageService implements ImageService {
     @Override
     @Nullable
     public List<String> getImages(String query) {
-        String googleQuery = "https://www.google.com/search?q=" + query.replaceAll(" ", "+") + "&tbm=isch&nfpr=1";
+        query = URLEncoder.encode(query);
+        String googleQuery = "https://www.google.com/search?q=" + query + "&tbm=isch&nfpr=1";
         List<String> links = new ArrayList<>();
         try {
             String html = getHTML(googleQuery);
