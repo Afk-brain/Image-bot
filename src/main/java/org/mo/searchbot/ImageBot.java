@@ -22,7 +22,13 @@ public class ImageBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        String query = update.getMessage().getText();
+        if(update.hasMessage() && update.getMessage().hasText() && update.getMessage().getText().startsWith("!")) {
+            sendPhoto(update);
+        }
+    }
+
+    private void sendPhoto(Update update) {
+        String query = update.getMessage().getText().substring(1);
         log.info("Message: {}\nFrom: {}", query, update.getMessage().getFrom().toString());
         List<String> links = imageService.getImages(query);
         SendPhoto photo = SendPhoto.builder()
