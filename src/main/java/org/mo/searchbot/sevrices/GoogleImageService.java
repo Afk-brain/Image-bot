@@ -75,16 +75,18 @@ public class GoogleImageService implements ImageService {
 
     private List<String> parseLinks(String html) {
         List<Element> scripts = Jsoup.parse(html).getElementsByTag("script");
-        return extractUrls(scripts.get(scripts.size() - 5).toString())//fifth script from the end contains all image links
-                .stream().filter((link) -> isImage(link)).collect(Collectors.toList());//filter images
+        List<String> result = new ArrayList<>();
+        for(int i = 1;i <= 5;i++) {
+            result = extractUrls(scripts.get(scripts.size() - i).toString(), result);
+        }
+        return result.stream().filter(this::isImage).collect(Collectors.toList());//filter images
     }
 
     private boolean isImage(String link) {
         return link.endsWith(".jpg") || link.endsWith(".gif") || link.endsWith(".png") || link.endsWith(".jpeg");
     }
 
-    public List<String> extractUrls(String input) {
-        List<String> result = new ArrayList<>();
+    public List<String> extractUrls(String input, List<String> result) {
         Matcher matcher = pattern.matcher(input);
         while (matcher.find()) {
             result.add(matcher.group());
