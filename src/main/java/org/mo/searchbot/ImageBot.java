@@ -35,6 +35,7 @@ public class ImageBot extends TelegramLongPollingBot {
         SendPhoto photo = SendPhoto.builder()
                 .chatId(update.getMessage().getChatId() + "")
                 .photo(new InputFile(randomLink(links)))
+                .replyToMessageId(update.getMessage().getMessageId())
                 .build();
         try {
             execute(photo);
