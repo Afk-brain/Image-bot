@@ -1,3 +1,7 @@
 *.iml
 .idea
 target
+out
+system.properties
+Procfile
+src/main/resources/META-INF/

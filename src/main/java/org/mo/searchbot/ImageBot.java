@@ -12,6 +12,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import java.io.IOException;
 import java.util.List;
+import java.util.Random;
 
 public class ImageBot extends TelegramLongPollingBot {
 
@@ -33,14 +34,19 @@ public class ImageBot extends TelegramLongPollingBot {
         List<String> links = imageService.getImages(query);
         SendPhoto photo = SendPhoto.builder()
                 .chatId(update.getMessage().getChatId() + "")
-                .photo(new InputFile(links.get(0)))
+                .photo(new InputFile(randomLink(links)))
                 .build();
         try {
             execute(photo);
-            log.info("Answer for {}: {}\nAll links: {}", update.getMessage().getFrom().toString(), links.get(0), links);
+            log.info("Answer for {}: {}\n", update.getMessage().getFrom().toString(), links.get(0));
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }
+    }
+
+    private String randomLink(List<String> links) {
+        Random random = new Random();
+        return links.get(random.nextInt(Math.min(9, links.size())));
     }
 
     @Override
