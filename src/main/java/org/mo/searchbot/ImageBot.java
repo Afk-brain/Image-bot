@@ -10,13 +10,15 @@ import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-
+import java.io.IOException;
 import java.util.List;
 
 public class ImageBot extends TelegramLongPollingBot {
 
     private Logger log = LoggerFactory.getLogger(ImageBot.class);
     private ImageService imageService = new GoogleImageService();
+
+    public ImageBot() throws IOException {}
 
     @Override
     public void onUpdateReceived(Update update) {

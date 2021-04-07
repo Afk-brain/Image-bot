@@ -6,33 +6,43 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
+import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class GoogleImageService implements ImageService {
 
-    private static final String DEFAULT_IMAGE = "https://i.ibb.co/qFs4Tw8/1.png";
-    private static final String USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103";
-    private static final Pattern pattern = Pattern.compile(
-            "\\b(((ht|f)tp(s?)\\:\\/\\/|~\\/|\\/)|www.)" +
-                    "(\\w+:\\w+@)?(([-\\w]+\\.)+(com|org|net|gov" +
-                    "|mil|biz|info|mobi|name|aero|jobs|museum" +
-                    "|travel|[a-z]{2}))(:[\\d]{1,5})?" +
-                    "(((\\/([-\\w~!$+|.,=]|%[a-f\\d]{2})+)+|\\/)+|\\?|#)?" +
-                    "((\\?([-\\w~!$+|.,*:]|%[a-f\\d{2}])+=?" +
-                    "([-\\w~!$+|.,*:=]|%[a-f\\d]{2})*)" +
-                    "(&(?:[-\\w~!$+|.,*:]|%[a-f\\d{2}])+=?" +
-                    "([-\\w~!$+|.,*:=]|%[a-f\\d]{2})*)*)*" +
-                    "(#([-\\w~!$+|.,*:=]|%[a-f\\d]{2})*)?\\b");
-    private HttpClient client = HttpClient.newHttpClient();
-    private Logger log = LoggerFactory.getLogger(GoogleImageService.class);
+    private final String defaultImage;
+    private final String userAgent;
+    private final Pattern pattern;
+    private final HttpClient client = HttpClient.newHttpClient();
+    private final Logger log = LoggerFactory.getLogger(GoogleImageService.class);
+
+    public GoogleImageService() throws IOException {
+        Properties properties = new Properties();
+        properties.load(getClass().getResourceAsStream("/gis.prefs"));
+        defaultImage = properties.getProperty("defaultImage");
+        userAgent = properties.getProperty("userAgent");
+        pattern = Pattern.compile(
+                "\\b(((ht|f)tp(s?)\\:\\/\\/|~\\/|\\/)|www.)" +
+                        "(\\w+:\\w+@)?(([-\\w]+\\.)+(com|org|net|gov" +
+                        "|mil|biz|info|mobi|name|aero|jobs|museum" +
+                        "|travel|[a-z]{2}))(:[\\d]{1,5})?" +
+                        "(((\\/([-\\w~!$+|.,=]|%[a-f\\d]{2})+)+|\\/)+|\\?|#)?" +
+                        "((\\?([-\\w~!$+|.,*:]|%[a-f\\d{2}])+=?" +
+                        "([-\\w~!$+|.,*:=]|%[a-f\\d]{2})*)" +
+                        "(&(?:[-\\w~!$+|.,*:]|%[a-f\\d{2}])+=?" +
+                        "([-\\w~!$+|.,*:=]|%[a-f\\d]{2})*)*)*" +
+                        "(#([-\\w~!$+|.,*:=]|%[a-f\\d]{2})*)?\\b");;
+    }
 
     @Override
     @Nullable
@@ -46,14 +56,14 @@ public class GoogleImageService implements ImageService {
             e.printStackTrace();
         }
         if(links.isEmpty()) {
-            links.add(DEFAULT_IMAGE);
+            links.add(defaultImage);
         }
         return links;
     }
 
     private String getHTML(String url) throws Exception {
         HttpRequest request = HttpRequest.newBuilder()
-                .setHeader("User-Agent", USER_AGENT)
+                .setHeader("User-Agent", userAgent)
                 .uri(URI.create(url))
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
@@ -71,7 +81,7 @@ public class GoogleImageService implements ImageService {
         return link.endsWith(".jpg") || link.endsWith(".gif") || link.endsWith(".png") || link.endsWith(".jpeg");
     }
 
-    public static List<String> extractUrls(String input) {
+    public List<String> extractUrls(String input) {
         List<String> result = new ArrayList<>();
         Matcher matcher = pattern.matcher(input);
         while (matcher.find()) {
