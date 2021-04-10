@@ -1,4 +1,4 @@
-package org.mo.searchbot.sevrices;
+package org.mo.searchbot.utils;
 
 import java.util.List;
 
