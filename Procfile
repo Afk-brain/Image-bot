@@ -1,1 +1,1 @@
-bot: java -jar out/artifacts/Image_Search_Bot_jar/Image_Search_Bot.jar
+bot: java -jar out/artifacts/isb.jar
