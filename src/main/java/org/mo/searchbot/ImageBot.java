@@ -2,8 +2,10 @@ package org.mo.searchbot;
 
 import org.mo.searchbot.utils.BotCommand;
 import org.mo.searchbot.utils.GoogleImageService;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import java.io.IOException;
@@ -35,6 +37,29 @@ public class ImageBot extends CommandBot {
     private String randomLink(List<String> links) {
         Random random = new Random();
         return links.get(random.nextInt(Math.min(9, links.size())));
+    }
+
+    @BotCommand("\\/help")
+    public void help(Update update) {
+        sendText(update, "Big Floppa is gay");
+    }
+
+    @BotCommand("\\/version")
+    public void version(Update update) {
+        sendText(update, "Alpha_v1.0");
+    }
+
+    private void sendText(Update update, String text) {
+        Message message = update.getMessage();
+        SendMessage sendMessage = SendMessage.builder()
+                .chatId(message.getChatId() + "")
+                .text(text)
+                .replyToMessageId(message.getMessageId()).build();
+        try {
+            execute(sendMessage);
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
