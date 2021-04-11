@@ -4,8 +4,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URLEncoder;
@@ -19,9 +17,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class GoogleImageService implements ImageService {
+public class GoogleImageService {
 
     private final String defaultImage;
+    private final String errorImage;
     private final String userAgent;
     private final Pattern pattern;
     private final HttpClient client = HttpClient.newHttpClient();
@@ -31,36 +30,29 @@ public class GoogleImageService implements ImageService {
         Properties properties = new Properties();
         properties.load(getClass().getResourceAsStream("/gis.prefs"));
         defaultImage = properties.getProperty("defaultImage");
+        errorImage = properties.getProperty("errorImage");
         userAgent = properties.getProperty("userAgent");
-        pattern = Pattern.compile(
-                "\\b(((ht|f)tp(s?)\\:\\/\\/|~\\/|\\/)|www.)" +
-                        "(\\w+:\\w+@)?(([-\\w]+\\.)+(com|org|net|gov" +
-                        "|mil|biz|info|mobi|name|aero|jobs|museum" +
-                        "|travel|[a-z]{2}))(:[\\d]{1,5})?" +
-                        "(((\\/([-\\w~!$+|.,=]|%[a-f\\d]{2})+)+|\\/)+|\\?|#)?" +
-                        "((\\?([-\\w~!$+|.,*:]|%[a-f\\d{2}])+=?" +
-                        "([-\\w~!$+|.,*:=]|%[a-f\\d]{2})*)" +
-                        "(&(?:[-\\w~!$+|.,*:]|%[a-f\\d{2}])+=?" +
-                        "([-\\w~!$+|.,*:=]|%[a-f\\d]{2})*)*)*" +
-                        "(#([-\\w~!$+|.,*:=]|%[a-f\\d]{2})*)?\\b");;
+        pattern = Pattern.compile(properties.getProperty("pattern"));
     }
 
-    @Override
-    @Nullable
     public List<String> getImages(String query) {
-        query = URLEncoder.encode(query);
-        String googleQuery = "https://www.google.com/search?q=" + query + "&tbm=isch&nfpr=1";
-        List<String> links = new ArrayList<>();
+        String googleQuery = createGoogleQuery(query);
         try {
             String html = getHTML(googleQuery);
-            links = parseLinks(html);
+            List<String> links = parseLinks(html);
+            if(links.isEmpty()) {
+                links.add(defaultImage);
+            }
+            return links;
         } catch (Exception e) {
             e.printStackTrace();
+            return List.of(errorImage);
         }
-        if(links.isEmpty()) {
-            links.add(defaultImage);
-        }
-        return links;
+    }
+
+    private String createGoogleQuery(String query) {
+        query = URLEncoder.encode(query);
+        return "https://www.google.com/search?q=" + query + "&tbm=isch&nfpr=1";
     }
 
     private String getHTML(String url) throws Exception {
@@ -69,7 +61,6 @@ public class GoogleImageService implements ImageService {
                 .uri(URI.create(url))
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        log.info("{} request status: {}", url, response.statusCode());
         return response.body();
     }
 
