@@ -1,1 +1,1 @@
-bot: java -jar out/artifacts/isb.jar
+bot: java -cp "target/ImageSearchBot.jar:target/libs/*" org.mo.searchbot.Main
