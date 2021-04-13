@@ -19,13 +19,13 @@ public class ImageBot extends CommandBot {
     public ImageBot() throws IOException {}
 
     @BotCommand("!.+")
-    public void sendPhoto(Update update) {
-        String query = update.getMessage().getText().substring(1);
+    public void sendPhoto(Message message) {
+        String query = message.getText().substring(1);
         List<String> links = imageService.getImages(query);
         SendPhoto photo = SendPhoto.builder()
-                .chatId(update.getMessage().getChatId().toString())
+                .chatId(message.getChatId().toString())
                 .photo(new InputFile(randomLink(links)))
-                .replyToMessageId(update.getMessage().getMessageId())
+                .replyToMessageId(message.getMessageId())
                 .build();
         try {
             execute(photo);
@@ -40,17 +40,16 @@ public class ImageBot extends CommandBot {
     }
 
     @BotCommand("\\/help")
-    public void help(Update update) {
-        sendText(update, "Big Floppa is gay");
+    public void help(Message message) {
+        replyText(message, "Big Floppa is gay");
     }
 
     @BotCommand("\\/version")
-    public void version(Update update) {
-        sendText(update, "Alpha_v1.0");
+    public void version(Message message) {
+        replyText(message, "Alpha_v1.0");
     }
 
-    private void sendText(Update update, String text) {
-        Message message = update.getMessage();
+    private void replyText(Message message, String text) {
         SendMessage sendMessage = SendMessage.builder()
                 .chatId(message.getChatId() + "")
                 .text(text)

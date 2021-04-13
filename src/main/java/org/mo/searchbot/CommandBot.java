@@ -42,7 +42,7 @@ public abstract class CommandBot extends TelegramLongPollingBot {
                 if(pattern.matcher(input).matches()) {
                     try {
                         log.info("Input:\"{}\" invoke method:{}",input,method.getName());
-                        method.invoke(this,update);
+                        method.invoke(this,update.getMessage());
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
