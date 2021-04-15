@@ -10,6 +10,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import java.io.IOException;
 import java.util.List;
+import java.util.Properties;
 import java.util.Random;
 
 public class ImageBot extends CommandBot {
@@ -23,15 +24,15 @@ public class ImageBot extends CommandBot {
     public void sendPhoto(Message message) {
         String query = message.getText().substring(1);
         List<String> links = imageService.getImages(query);
+        SendPhoto sendPhoto = SendPhoto.builder()
+                .chatId(message.getChatId().toString())
+                .replyToMessageId(message.getMessageId())
+                .build();
         int c = 0;
         while(c++ < ATTEMPTS) {
-            SendPhoto photo = SendPhoto.builder()
-                    .chatId(message.getChatId().toString())
-                    .photo(new InputFile(chooseLink(links)))
-                    .replyToMessageId(message.getMessageId())
-                    .build();
+            sendPhoto.setPhoto(new InputFile(chooseLink(links)));
             try {
-                execute(photo);
+                execute(sendPhoto);
                 return;
             } catch (TelegramApiException e) {
                 e.printStackTrace();
@@ -52,7 +53,14 @@ public class ImageBot extends CommandBot {
 
     @BotCommand("\\/version")
     public void version(Message message) {
-        replyText(message, "Alpha_v1.1");//TODO move to config
+        Properties properties = new Properties();
+        try {
+            properties.load(getClass().getResourceAsStream("/gis.prefs"));
+            replyText(message, properties.getProperty("version"));
+        } catch (IOException e) {
+            e.printStackTrace();
+            replyText(message, "Nice dick, bro");
+        }
     }
 
     @Override
