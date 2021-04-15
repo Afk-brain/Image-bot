@@ -15,6 +15,7 @@ import java.util.Random;
 public class ImageBot extends CommandBot {
 
     private final GoogleImageService imageService = new GoogleImageService();
+    private final static int ATTEMPTS = 5;
 
     public ImageBot() throws IOException {}
 
@@ -22,16 +23,21 @@ public class ImageBot extends CommandBot {
     public void sendPhoto(Message message) {
         String query = message.getText().substring(1);
         List<String> links = imageService.getImages(query);
-        SendPhoto photo = SendPhoto.builder()
-                .chatId(message.getChatId().toString())
-                .photo(new InputFile(chooseLink(links)))
-                .replyToMessageId(message.getMessageId())
-                .build();
-        try {
-            execute(photo);
-        } catch (TelegramApiException e) {
-            e.printStackTrace();
+        int c = 0;
+        while(c++ < ATTEMPTS) {
+            SendPhoto photo = SendPhoto.builder()
+                    .chatId(message.getChatId().toString())
+                    .photo(new InputFile(chooseLink(links)))
+                    .replyToMessageId(message.getMessageId())
+                    .build();
+            try {
+                execute(photo);
+                return;
+            } catch (TelegramApiException e) {
+                e.printStackTrace();
+            }
         }
+        replyText(message, "Fuck off");
     }
 
     private String chooseLink(List<String> links) {//TODO rework
