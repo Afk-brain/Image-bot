@@ -26,17 +26,18 @@ public class ImageBot extends CommandBot {
         List<String> links = imageService.getImages(query);
         SendPhoto sendPhoto = SendPhoto.builder()
                 .chatId(message.getChatId().toString())
+                .photo(new InputFile(chooseLink(links)))
                 .replyToMessageId(message.getMessageId())
                 .build();
         int c = 0;
         while(c++ < ATTEMPTS) {
-            sendPhoto.setPhoto(new InputFile(chooseLink(links)));
             try {
                 execute(sendPhoto);
                 return;
             } catch (TelegramApiException e) {
                 e.printStackTrace();
             }
+            sendPhoto.setPhoto(new InputFile(chooseLink(links)));
         }
         replyText(message, "Fuck off");
     }
