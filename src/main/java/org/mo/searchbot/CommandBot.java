@@ -4,8 +4,11 @@ import org.mo.searchbot.utils.BotCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -48,6 +51,18 @@ public abstract class CommandBot extends TelegramLongPollingBot {
                     }
                 }
             }));
+        }
+    }
+
+    protected void replyText(Message message, String text) {
+        SendMessage sendMessage = SendMessage.builder()
+                .chatId(message.getChatId() + "")
+                .text(text)
+                .replyToMessageId(message.getMessageId()).build();
+        try {
+            execute(sendMessage);
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
         }
     }
 }

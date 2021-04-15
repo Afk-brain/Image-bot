@@ -68,21 +68,20 @@ public class GoogleImageService {
         List<Element> scripts = Jsoup.parse(html).getElementsByTag("script");
         List<String> result = new ArrayList<>();
         for(int i = 1;i <= 5;i++) {
-            result = extractUrls(scripts.get(scripts.size() - i).toString(), result);
+            extractUrlsToList(scripts.get(scripts.size() - i).toString(), result);
         }
-        return result.stream().filter(this::isImage).collect(Collectors.toList());//filter images
+        return result.stream().filter(this::isImage).collect(Collectors.toList());
     }
 
     private boolean isImage(String link) {
         return link.endsWith(".jpg") || link.endsWith(".gif") || link.endsWith(".png") || link.endsWith(".jpeg");
     }
 
-    public List<String> extractUrls(String input, List<String> result) {
+    private void extractUrlsToList(String input, List<String> result) {
         Matcher matcher = pattern.matcher(input);
         while (matcher.find()) {
             result.add(matcher.group());
         }
-        return result;
     }
 
 }

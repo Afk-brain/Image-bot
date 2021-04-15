@@ -24,7 +24,7 @@ public class ImageBot extends CommandBot {
         List<String> links = imageService.getImages(query);
         SendPhoto photo = SendPhoto.builder()
                 .chatId(message.getChatId().toString())
-                .photo(new InputFile(randomLink(links)))
+                .photo(new InputFile(chooseLink(links)))
                 .replyToMessageId(message.getMessageId())
                 .build();
         try {
@@ -34,31 +34,19 @@ public class ImageBot extends CommandBot {
         }
     }
 
-    private String randomLink(List<String> links) {
+    private String chooseLink(List<String> links) {//TODO rework
         Random random = new Random();
         return links.get(random.nextInt(Math.min(9, links.size())));
     }
 
     @BotCommand("\\/help")
     public void help(Message message) {
-        replyText(message, "Big Floppa is gay");
+        replyText(message, "Big Floppa is gay");//TODO add description
     }
 
     @BotCommand("\\/version")
     public void version(Message message) {
-        replyText(message, "Alpha_v1.0");
-    }
-
-    private void replyText(Message message, String text) {
-        SendMessage sendMessage = SendMessage.builder()
-                .chatId(message.getChatId() + "")
-                .text(text)
-                .replyToMessageId(message.getMessageId()).build();
-        try {
-            execute(sendMessage);
-        } catch (TelegramApiException e) {
-            e.printStackTrace();
-        }
+        replyText(message, "Alpha_v1.1");//TODO move to config
     }
 
     @Override
