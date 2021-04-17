@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
@@ -51,6 +52,8 @@ public abstract class CommandBot extends TelegramLongPollingBot {
                     }
                 }
             }));
+        } else if(update.hasCallbackQuery()) {
+            processCallbackQuery(update.getCallbackQuery());
         }
     }
 
@@ -64,5 +67,9 @@ public abstract class CommandBot extends TelegramLongPollingBot {
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }
+    }
+
+    protected void processCallbackQuery(CallbackQuery callbackQuery) {
+
     }
 }
