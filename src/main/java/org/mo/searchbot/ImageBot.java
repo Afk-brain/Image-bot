@@ -49,7 +49,7 @@ public class ImageBot extends CommandBot {
         List<InlineKeyboardButton> row = new ArrayList<>();
         row.add(InlineKeyboardButton.builder().text(pos - 1 >= 0 ? "◀" : "❌")
                 .callbackData(pos - 1 >= 0 ? id + " " + (pos - 1) + " " + System.nanoTime() : "-1").build());
-        row.add(InlineKeyboardButton.builder().text(pos + "").callbackData("-2").build());
+        row.add(InlineKeyboardButton.builder().text(pos + 1 + "").callbackData("-2").build());
         row.add(InlineKeyboardButton.builder().text(pos + 1 < links.size() ? "▶": "❌")
                 .callbackData(pos + 1 < links.size() ? id + " " + (pos + 1) + " " + System.nanoTime(): "-3").build());
         return InlineKeyboardMarkup.builder().keyboardRow(row).build();
