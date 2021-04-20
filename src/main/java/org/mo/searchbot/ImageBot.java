@@ -40,31 +40,34 @@ public class ImageBot extends CommandBot {
     }
 
     private InlineKeyboardMarkup getKeyboard(List<String> links, int pos) {
-        long id = System.currentTimeMillis();
+        long id = System.nanoTime();
         storage.put(id, links);
         return getKeyboard(links, pos, id);
     }
 
     private InlineKeyboardMarkup getKeyboard(List<String> links, int pos, long id) {
         List<InlineKeyboardButton> row = new ArrayList<>();
-        if(pos - 1 >= 0) {
-            row.add(InlineKeyboardButton.builder().text((pos - 1) + "<<<").callbackData(id + " " + (pos - 1)).build());
-        }
-        if(pos + 1 < links.size()) {
-            row.add(InlineKeyboardButton.builder().text(">>>" + (pos + 1)).callbackData(id + " " + (pos + 1)).build());
-        }
+        row.add(InlineKeyboardButton.builder().text(pos - 1 >= 0 ? "◀" : "❌")
+                .callbackData(pos - 1 >= 0 ? id + " " + (pos - 1) + " " + System.nanoTime() : "-1").build());
+        row.add(InlineKeyboardButton.builder().text(pos + "").callbackData("-2").build());
+        row.add(InlineKeyboardButton.builder().text(pos + 1 < links.size() ? "▶": "❌")
+                .callbackData(pos + 1 < links.size() ? id + " " + (pos + 1) + " " + System.nanoTime(): "-3").build());
         return InlineKeyboardMarkup.builder().keyboardRow(row).build();
     }
 
     @Override
     protected void processCallbackQuery(CallbackQuery query) {
         String data = query.getData();
+        if(data.startsWith("-")) {
+            sendNotification(query, "?", false);//TODO change notification text
+            return;
+        }
         String[] parts = data.split(" ");
         long id = Long.parseLong(parts[0]);
         int pos = Integer.parseInt(parts[1]);
         List<String> links = storage.get(id);
         if(links == null) {
-            sendNotification(query, "Image timeout");
+            sendNotification(query, "Image timeout", true);
             return;
         }
         EditMessageMedia media = EditMessageMedia.builder()
@@ -80,11 +83,11 @@ public class ImageBot extends CommandBot {
         }
     }
 
-    private boolean sendNotification(CallbackQuery query, String text) {
+    private boolean sendNotification(CallbackQuery query, String text, boolean notification) {
         AnswerCallbackQuery answer = AnswerCallbackQuery.builder()
                 .text(text)
                 .callbackQueryId(query.getId())
-                .showAlert(true)
+                .showAlert(notification)
                 .build();
         try {
             execute(answer);
