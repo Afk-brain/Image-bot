@@ -2,6 +2,7 @@ package org.mo.searchbot;
 
 import org.mo.searchbot.utils.BotCommand;
 import org.mo.searchbot.utils.GoogleImageService;
+import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageMedia;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
@@ -62,6 +63,10 @@ public class ImageBot extends CommandBot {
         long id = Long.parseLong(parts[0]);
         int pos = Integer.parseInt(parts[1]);
         List<String> links = storage.get(id);
+        if(links == null) {
+            sendNotification(query, "Image timeout");
+            return;
+        }
         EditMessageMedia media = EditMessageMedia.builder()
                 .messageId(query.getMessage().getMessageId())
                 .chatId(query.getMessage().getChatId().toString())
@@ -72,6 +77,21 @@ public class ImageBot extends CommandBot {
             execute(media);
         } catch (TelegramApiException e) {
             e.printStackTrace();
+        }
+    }
+
+    private boolean sendNotification(CallbackQuery query, String text) {
+        AnswerCallbackQuery answer = AnswerCallbackQuery.builder()
+                .text(text)
+                .callbackQueryId(query.getId())
+                .showAlert(true)
+                .build();
+        try {
+            execute(answer);
+            return true;
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+            return false;
         }
     }
 
