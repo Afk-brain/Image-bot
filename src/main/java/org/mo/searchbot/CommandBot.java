@@ -69,7 +69,5 @@ public abstract class CommandBot extends TelegramLongPollingBot {
         }
     }
 
-    protected void processCallbackQuery(CallbackQuery callbackQuery) {
-
-    }
+    protected abstract void processCallbackQuery(CallbackQuery callbackQuery);
 }
