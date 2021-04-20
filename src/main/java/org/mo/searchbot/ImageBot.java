@@ -8,6 +8,7 @@ import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageMe
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.media.InputMediaPhoto;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
@@ -32,6 +33,8 @@ public class ImageBot extends CommandBot {
                 .replyToMessageId(message.getMessageId())
                 .replyMarkup(getKeyboard(links, 0))
                 .build();
+        User user = message.getFrom();
+        log.info("Sending {} to \"{} {}\", for \"{}\"",links.get(0), user.getFirstName(), user.getUserName(), query);
         try {
             execute(sendPhoto);
         } catch (TelegramApiException e) {
@@ -42,10 +45,12 @@ public class ImageBot extends CommandBot {
     private InlineKeyboardMarkup getKeyboard(List<String> links, int pos) {
         long id = System.nanoTime();
         storage.put(id, links);
+        log.info("Creating id: {}", id);
         return getKeyboard(links, pos, id);
     }
 
     private InlineKeyboardMarkup getKeyboard(List<String> links, int pos, long id) {
+        log.info("Creating keyboard for {} position and {} id from {} images", pos, id, links.size());
         List<InlineKeyboardButton> row = new ArrayList<>();
         row.add(InlineKeyboardButton.builder().text(pos - 1 >= 0 ? "◀" : "❌")
                 .callbackData(pos - 1 >= 0 ? id + " " + (pos - 1) + " " + System.nanoTime() : "-1").build());
@@ -57,6 +62,7 @@ public class ImageBot extends CommandBot {
 
     @Override
     protected void processCallbackQuery(CallbackQuery query) {
+        log.info("Processing query");
         String data = query.getData();
         if(data.startsWith("-")) {
             sendNotification(query, "?", false);//TODO change notification text
@@ -76,6 +82,7 @@ public class ImageBot extends CommandBot {
                 .replyMarkup(getKeyboard(links, pos, id))
                 .media(InputMediaPhoto.builder().media(links.get(pos)).build())
                 .build();
+        log.info("Sending {} to \"{} {}\"",links.get(pos), query.getFrom().getFirstName(), query.getFrom().getUserName());
         try {
             execute(media);
         } catch (TelegramApiException e) {
@@ -84,6 +91,7 @@ public class ImageBot extends CommandBot {
     }
 
     private boolean sendNotification(CallbackQuery query, String text, boolean notification) {
+        log.info("Sending notification to \"{} {}\" with text \"{}\"", query.getFrom().getFirstName(), query.getFrom().getUserName(), text);
         AnswerCallbackQuery answer = AnswerCallbackQuery.builder()
                 .text(text)
                 .callbackQueryId(query.getId())

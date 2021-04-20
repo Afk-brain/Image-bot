@@ -41,11 +41,11 @@ public abstract class CommandBot extends TelegramLongPollingBot {
         if(update.hasMessage() && update.getMessage().hasText()) {
             String input = update.getMessage().getText();
             User user = update.getMessage().getFrom();
-            log.info("{}: {}", user.getFirstName() + user.getLastName() + user.getUserName(), input);
+            log.info("Username: {}; Tag: {}; Input: {};", user.getFirstName(), user.getUserName(), input);
             methods.forEach(((pattern, method) -> {
                 if(pattern.matcher(input).matches()) {
                     try {
-                        log.info("Input:\"{}\" invoke method:{}",input,method.getName());
+                        log.info("Invoking method:\"{}\", for input:\"{}\"", method.getName(),input);
                         method.invoke(this,update.getMessage());
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -53,11 +53,14 @@ public abstract class CommandBot extends TelegramLongPollingBot {
                 }
             }));
         } else if(update.hasCallbackQuery()) {
+            log.info("Calling processCallbackQuery() for \"{} {}\", query data: {}", update.getCallbackQuery().getFrom().getFirstName()
+                    , update.getCallbackQuery().getFrom().getUserName(), update.getCallbackQuery().getData());
             processCallbackQuery(update.getCallbackQuery());
         }
     }
 
     protected void replyText(Message message, String text) {
+        log.info("Replying to \"{} {}\"her with \"{}\"",message.getFrom().getFirstName(), message.getFrom().getUserName(), text);
         SendMessage sendMessage = SendMessage.builder()
                 .chatId(message.getChatId() + "")
                 .text(text)

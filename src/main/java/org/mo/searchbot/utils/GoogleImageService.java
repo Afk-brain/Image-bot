@@ -36,6 +36,7 @@ public class GoogleImageService {
     }
 
     public List<String> getImages(String query) {
+        log.info("Searching images for \"{}\"", query);
         String googleQuery = createGoogleQuery(query);
         try {
             String html = getHTML(googleQuery);
@@ -43,6 +44,7 @@ public class GoogleImageService {
             if(links.isEmpty()) {
                 links.add(defaultImage);
             }
+            log.info("Found {} images", links.size());
             return links;
         } catch (Exception e) {
             e.printStackTrace();
