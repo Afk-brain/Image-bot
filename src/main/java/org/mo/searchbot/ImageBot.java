@@ -55,7 +55,7 @@ public class ImageBot extends CommandBot {
         if(pos - 1 >= 0) {
             row.add(InlineKeyboardButton.builder().text("◀").callbackData(id + " " + (pos - 1) + " " + System.nanoTime()).build());
         }
-        row.add(InlineKeyboardButton.builder().text(pos + 1 + "").callbackData("-2").build());
+        row.add(InlineKeyboardButton.builder().text(pos + 1 + "").callbackData("-" + (pos + 1)).build());
         if(pos + 1 < links.size()) {
             row.add(InlineKeyboardButton.builder().text("▶" ).callbackData(id + " " + (pos + 1) + " " + System.nanoTime()).build());
         }
@@ -67,7 +67,7 @@ public class ImageBot extends CommandBot {
         log.info("Processing query");
         String data = query.getData();
         if(data.startsWith("-")) {
-            sendNotification(query, "?", false);//TODO change notification text
+            sendNotification(query, data.substring(1), false);
             return;
         }
         String[] parts = data.split(" ");
