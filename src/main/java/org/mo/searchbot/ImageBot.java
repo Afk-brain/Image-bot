@@ -52,11 +52,13 @@ public class ImageBot extends CommandBot {
     private InlineKeyboardMarkup getKeyboard(List<String> links, int pos, long id) {
         log.info("Creating keyboard for {} position and {} id from {} images", pos, id, links.size());
         List<InlineKeyboardButton> row = new ArrayList<>();
-        row.add(InlineKeyboardButton.builder().text(pos - 1 >= 0 ? "◀" : "❌")
-                .callbackData(pos - 1 >= 0 ? id + " " + (pos - 1) + " " + System.nanoTime() : "-1").build());
+        if(pos - 1 >= 0) {
+            row.add(InlineKeyboardButton.builder().text("◀").callbackData(id + " " + (pos - 1) + " " + System.nanoTime()).build());
+        }
         row.add(InlineKeyboardButton.builder().text(pos + 1 + "").callbackData("-2").build());
-        row.add(InlineKeyboardButton.builder().text(pos + 1 < links.size() ? "▶": "❌")
-                .callbackData(pos + 1 < links.size() ? id + " " + (pos + 1) + " " + System.nanoTime(): "-3").build());
+        if(pos + 1 < links.size()) {
+            row.add(InlineKeyboardButton.builder().text("▶" ).callbackData(id + " " + (pos + 1) + " " + System.nanoTime()).build());
+        }
         return InlineKeyboardMarkup.builder().keyboardRow(row).build();
     }
 
