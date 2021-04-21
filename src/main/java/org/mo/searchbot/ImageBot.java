@@ -82,11 +82,17 @@ public class ImageBot extends CommandBot {
                 .replyMarkup(getKeyboard(links, pos, id))
                 .media(InputMediaPhoto.builder().media(links.get(pos)).build())
                 .build();
-        log.info("Sending {} to \"{} {}\"",links.get(pos), query.getFrom().getFirstName(), query.getFrom().getUserName());
-        try {
-            execute(media);
-        } catch (TelegramApiException e) {
-            e.printStackTrace();
+        while(true) {
+            try {
+                log.info("Sending {} to \"{} {}\"",media.getMedia().getMedia(), query.getFrom().getFirstName(), query.getFrom().getUserName());
+                execute(media);
+                break;
+            } catch (TelegramApiException e) {
+                e.printStackTrace();
+                log.info("Removing {}, now links contains {} images", links.remove(pos), links.size());
+                media.setReplyMarkup(getKeyboard(links, pos, id));
+                media.setMedia(InputMediaPhoto.builder().media(links.get(pos)).build());
+            }
         }
     }
 
