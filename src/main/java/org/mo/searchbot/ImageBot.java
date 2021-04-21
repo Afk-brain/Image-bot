@@ -23,6 +23,11 @@ public class ImageBot extends CommandBot {
 
     public ImageBot() throws IOException {}
 
+    @BotCommand("/help|/start")
+    public void info(Message message) {
+        replyText(message, "*Команди\\:*\n\n\\/help \\- всі команди\n\\!_запит для пошуку_ \\- пошук картинок за ключовими словами");
+    }
+
     @BotCommand("!.+")
     public void sendPhoto(Message message) {
         String query = message.getText().substring(1);

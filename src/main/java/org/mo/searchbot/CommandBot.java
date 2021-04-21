@@ -40,12 +40,16 @@ public abstract class CommandBot extends TelegramLongPollingBot {
     public void onUpdateReceived(Update update) {
         if(update.hasMessage() && update.getMessage().hasText()) {
             String input = update.getMessage().getText();
+            if(input.contains("@" + getBotUsername())) {
+                input = input.replaceAll("@" + getBotUsername(), "");
+            }
+            String text = input;
             User user = update.getMessage().getFrom();
             log.info("Username: {}; Tag: {}; Input: {};", user.getFirstName(), user.getUserName(), input);
             methods.forEach(((pattern, method) -> {
-                if(pattern.matcher(input).matches()) {
+                if(pattern.matcher(text).matches()) {
                     try {
-                        log.info("Invoking method:\"{}\", for input:\"{}\"", method.getName(),input);
+                        log.info("Invoking method:\"{}\", for input:\"{}\"", method.getName(),text);
                         method.invoke(this,update.getMessage());
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -64,6 +68,7 @@ public abstract class CommandBot extends TelegramLongPollingBot {
         SendMessage sendMessage = SendMessage.builder()
                 .chatId(message.getChatId() + "")
                 .text(text)
+                .parseMode("MarkdownV2")
                 .replyToMessageId(message.getMessageId()).build();
         try {
             execute(sendMessage);
