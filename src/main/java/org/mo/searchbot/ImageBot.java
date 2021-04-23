@@ -1,19 +1,25 @@
 package org.mo.searchbot;
 
 import org.mo.searchbot.utils.BotCommand;
+import org.mo.searchbot.utils.Demotivator;
 import org.mo.searchbot.utils.GoogleImageService;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
+import org.telegram.telegrambots.meta.api.methods.GetFile;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageMedia;
-import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
-import org.telegram.telegrambots.meta.api.objects.InputFile;
-import org.telegram.telegrambots.meta.api.objects.Message;
-import org.telegram.telegrambots.meta.api.objects.User;
+import org.telegram.telegrambots.meta.api.objects.*;
 import org.telegram.telegrambots.meta.api.objects.media.InputMediaPhoto;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.*;
 
 public class ImageBot extends CommandBot {
@@ -22,6 +28,37 @@ public class ImageBot extends CommandBot {
     private Map<Long, List<String>> storage = new HashMap<>();
 
     public ImageBot() throws IOException {}
+
+    @BotCommand("/dem .+")
+    public void demotivate(Message message) {
+        if(message.isReply() && message.getReplyToMessage().hasPhoto()) {
+            List<PhotoSize> photos = message.getReplyToMessage().getPhoto();
+            GetFile getFile = GetFile.builder().fileId(photos.get(photos.size() - 1).getFileId()).build();
+            String text = message.getText().replace("/dem ", "");
+            try {
+                File file = execute(getFile);
+                String imageURL = file.getFileUrl(getBotToken());
+                URL url = new URL(imageURL);
+                BufferedImage image = ImageIO.read(url);
+                log.info("Demotivating {} with \"{}\"", imageURL, text);
+                Demotivator demotivator = new Demotivator(image);
+                image = demotivator.demotivate(text);
+                log.info("Sending demotivated image to \"{} {}\"", message.getFrom().getFirstName(), message.getFrom().getUserName());
+                ByteArrayOutputStream os = new ByteArrayOutputStream();
+                ImageIO.write(image, "jpg", os);
+                InputStream is = new ByteArrayInputStream(os.toByteArray());
+                InputFile inputFile = new InputFile();
+                inputFile.setMedia(is, "image");
+                SendPhoto photo = SendPhoto.builder()
+                        .chatId(message.getChatId() + "")
+                        .replyToMessageId(message.getMessageId())
+                        .photo(inputFile).build();
+                execute(photo);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     @BotCommand("/help|/start")
     public void info(Message message) {
@@ -60,7 +97,7 @@ public class ImageBot extends CommandBot {
         if(pos - 1 >= 0) {
             row.add(InlineKeyboardButton.builder().text("◀").callbackData(id + " " + (pos - 1) + " " + System.nanoTime()).build());
         }
-        row.add(InlineKeyboardButton.builder().text(pos + 1 + "").callbackData("-" + (pos + 1)).build());
+        row.add(InlineKeyboardButton.builder().text(pos + 1 + ""gti).callbackData("-" + (pos + 1)).build());
         if(pos + 1 < links.size()) {
             row.add(InlineKeyboardButton.builder().text("▶" ).callbackData(id + " " + (pos + 1) + " " + System.nanoTime()).build());
         }
