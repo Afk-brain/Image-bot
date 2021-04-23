@@ -97,7 +97,7 @@ public class ImageBot extends CommandBot {
         if(pos - 1 >= 0) {
             row.add(InlineKeyboardButton.builder().text("◀").callbackData(id + " " + (pos - 1) + " " + System.nanoTime()).build());
         }
-        row.add(InlineKeyboardButton.builder().text(pos + 1 + ""gti).callbackData("-" + (pos + 1)).build());
+        row.add(InlineKeyboardButton.builder().text(pos + 1 + "/" + links.size()).callbackData("-" + (pos + 1)).build());
         if(pos + 1 < links.size()) {
             row.add(InlineKeyboardButton.builder().text("▶" ).callbackData(id + " " + (pos + 1) + " " + System.nanoTime()).build());
         }
