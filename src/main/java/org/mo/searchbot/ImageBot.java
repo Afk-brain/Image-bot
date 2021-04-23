@@ -62,7 +62,7 @@ public class ImageBot extends CommandBot {
 
     @BotCommand("/help|/start")
     public void info(Message message) {
-        replyText(message, "*Команди\\:*\n\n\\/help \\- всі команди\n\\!_запит для пошуку_ \\- пошук картинок за ключовими словами");
+        replyText(message, "*Команди\\:*\n\n\\/help \\- всі команди\n\\!_запит для пошуку_ \\- пошук картинок за ключовими словами\n\\/dem \\- демотивація");
     }
 
     @BotCommand("!.+")
