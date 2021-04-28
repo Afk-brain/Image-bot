@@ -20,8 +20,8 @@ public class Demotivator {
     public Demotivator(BufferedImage image) {
         log.info("Defining image parameters");
         src = image;
-        innerBlack = 5;
-        innerWhite = 5;
+        innerBlack = Math.max(src.getHeight(), src.getWidth()) / 200;
+        innerWhite = innerBlack;
         blackTop = src.getHeight() / 10;
         blackSide = src.getWidth() / 10;
         textHeight = src.getHeight() / 8;
