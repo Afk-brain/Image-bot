@@ -84,6 +84,13 @@ public class ImageBot extends CommandBot {
         }
     }
 
+    @BotCommand("amogus is sus")
+    public void stop(Message message) {
+        replyText(message, "Бот офається");
+        log.info("Shutting down manually");
+        System.exit(0);
+    }
+
     private InlineKeyboardMarkup getKeyboard(List<String> links, int pos) {
         long id = System.nanoTime();
         storage.put(id, links);
